@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "553547457899",
+    "firebase_url": "https://notificaciones-de-colegios.firebaseio.com",
+    "project_id": "notificaciones-de-colegios",
+    "storage_bucket": "notificaciones-de-colegios.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553547457899:android:baa65dd28fb949923d582e",
+        "android_client_info": {
+          "package_name": "com.proyectofcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "553547457899-silgi4dmlbdnd0bvsi44h6b5ob7rel8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUM4NahJJwyJr7rUhXjBGUsdu9JfrHYV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "553547457899-silgi4dmlbdnd0bvsi44h6b5ob7rel8f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
