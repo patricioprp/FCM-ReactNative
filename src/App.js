@@ -7,34 +7,126 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Alert, AsyncStorage} from 'react-native';
+import {Text, View, Alert, AsyncStorage} from 'react-native';
 import firebase from 'react-native-firebase';
+import { Header, Button, Spinner, CardSection } from "./components/common";
+import LoginForm from "./components/LoginForm";
+import {AsyncStorage as AS} from '@react-native-community/async-storage';
+import { USER_URL, LOGOUT_URL} from "./config/URL";
+import  Login  from "./components/Login";
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+export default class App extends Component {
 
-type Props = {};
-export default class App extends Component<Props> {
+  constructor(props){
+    super(props);
+    this.state = {
+      loggeIn: null,
+      user:'',
+      token: '',
+      body:'',
+      title:'',
+    };
+    this.getKey = this.getKey.bind(this);
+    this.login = this.login.bind(this);
+  } 
 
-  state = {
-    token: '',
-    body:'',
-    title:''
-  };
   async componentDidMount() {
     this.checkPermission();
     this.createNotificationListeners(); //add this line
+    this.login(); 
   }
 
   componentWillUnmount() {
     this.notificationListener;
     this.notificationOpenedListener;
-  }
 
+  }
+  login() {
+    this.getKey().then(value => {
+        console.log('value',value)
+        fetch(USER_URL,{
+          method:'POST',
+          body: JSON.stringify({
+            token: value
+          }),
+          headers:{ 
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+            },
+      })
+      .then(response => response.json())
+      .then(json =>{
+         console.log('JSON',json);
+         if(json.error){
+          this.setState({ loggeIn: false });
+         }
+         else{
+          this.setState({ loggeIn: true });
+          console.log('loggeIn',this.state.loggeIn);
+          this.setState({ user: json});
+         }
+     
+      })
+      .catch((error) => {
+        console.log('ERROR',error)
+        this.setState({ loggeIn: false });
+        console.log('loggeIn',this.state.loggeIn);
+     })
+      });
+    }
+    
+      async getKey() {
+        try {
+          const value = await AS.getItem('@token');
+          console.log('accediendo la key',value);
+         return (value)
+        } catch (error) {
+          console.log("Error retrieving data" + error);
+        };
+      }
+    
+    
+      onButtonPressLogout()
+      {
+    this.getKey().then(value => {
+      console.log(value)
+      fetch(LOGOUT_URL,{
+        method:'POST',
+        body: JSON.stringify({
+          token: value
+        }),
+        headers:{ 
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+          },
+    })
+    .then(response => response.json())
+    .then(json =>{
+       console.log('JSON',json);
+       this.setState({
+         loggeIn: false,
+         user:''
+        });
+    
+    })
+    .catch((error) => {
+      console.log('ERROR',error)
+    })
+    });   
+      }
+    
+      renderContent() {
+        switch (this.state.loggeIn) {
+          case true:
+            return (
+    <Login />
+            );
+          case false:
+            return <LoginForm />;
+          default:
+            return <Spinner size="large" />;
+        }
+      }
   //1
   async checkPermission() {
     const enabled = await firebase.messaging().hasPermission();
@@ -131,34 +223,29 @@ export default class App extends Component<Props> {
       console.log("JSON.stringify:", JSON.stringify(message));
     });
   }
+  //Login
+  renderContent() {
+    switch (this.state.loggeIn) {
+      case true:
+        return (
+          <CardSection>
+            <Button onPress={() => firebase.auth().signOut()}>Salir</Button>
+          </CardSection>
+        );
+      case false:
+        return <LoginForm />;
+      default:
+        return <Spinner size="large" />;
+    }
+  }
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+      <View>
+        <Header headerText="Autenticacion" />
+        {this.renderContent()}
         <Text>el token es {this.state.token}</Text>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
