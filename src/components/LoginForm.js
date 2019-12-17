@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Text } from "react-native";
-import AsyncStorage from '@react-native-community/async-storage';
+import { Text, AsyncStorage } from "react-native";
+//import AsyncStorage from '@react-native-community/async-storage';
 import { Card, CardSection, Button, Input, Spinner } from "./common";
 import Login from "./Login";
 import App from "../App";
@@ -61,8 +61,8 @@ class LoginForm extends Component {
 
   async saveKey(value) {
     try {
-      await AsyncStorage.setItem('@token', value);
-      console.log('se guardo la key');
+      await AsyncStorage.setItem('token', value);
+      console.log('se guardo la key',value);
       this.onloginSuccess();
     } catch (error) {
       console.log("Error saving data" + error);
@@ -92,7 +92,7 @@ class LoginForm extends Component {
     if (this.state.loading) {
       return <Spinner size="small" />;
     }
-    return <Button onPress={this.onButtonPress.bind(this)}>Log in</Button>;
+    return <Button onPress={this.onButtonPress.bind(this)}>Ingresar</Button>;
   }
 
   render() {
@@ -104,7 +104,7 @@ else{
     <Card>
       <CardSection>
         <Input
-          placeholder="user@gmail.com"
+          placeholder="usuario@email.com"
           label="Email"
           value={this.state.email}
           onChangeText={email => this.setState({ email })}
@@ -113,8 +113,8 @@ else{
       <CardSection>
         <Input
           secureTextEntry
-          placeholder="password"
-          label="Password"
+          placeholder="contraseña"
+          label="Contraseña"
           value={this.state.password}
           onChangeText={password => this.setState({ password })}
         />

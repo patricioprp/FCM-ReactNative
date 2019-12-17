@@ -11,8 +11,8 @@ import {Text, View, Alert, AsyncStorage} from 'react-native';
 import firebase from 'react-native-firebase';
 import { Header, Button, Spinner, CardSection } from "./components/common";
 import LoginForm from "./components/LoginForm";
-import {AsyncStorage as AS} from '@react-native-community/async-storage';
-import { USER_URL, LOGOUT_URL} from "./config/URL";
+//import {AsyncStorage as AS} from "@react-native-community/async-storage";
+import { USER_URL, LOGOUT_URL, TOKEN_FCM_URL } from "./config/URL";
 import  Login  from "./components/Login";
 
 export default class App extends Component {
@@ -30,20 +30,33 @@ export default class App extends Component {
     this.login = this.login.bind(this);
   } 
 
-  async componentDidMount() {
-    this.checkPermission();
-    this.createNotificationListeners(); //add this line
-    this.login(); 
-  }
 
-  componentWillUnmount() {
+    componentWillUnmount() { 
     this.notificationListener;
     this.notificationOpenedListener;
+    
+  }
+
+  async componentDidMount() {
+    this.login();
+    this.checkPermission();
+    this.createNotificationListeners(); //add this line
 
   }
+
+  async getKey() {
+    try {
+      const value = await AsyncStorage.getItem('token');
+      console.log('accediendo la key',value);
+     return (value)
+    } catch (error) {
+      console.log("Error retrieving data" + error);
+    };
+  }
+  
   login() {
     this.getKey().then(value => {
-        console.log('value',value)
+        //console.log('value',value)
         fetch(USER_URL,{
           method:'POST',
           body: JSON.stringify({
@@ -63,7 +76,9 @@ export default class App extends Component {
          else{
           this.setState({ loggeIn: true });
           console.log('loggeIn',this.state.loggeIn);
-          this.setState({ user: json});
+          this.setState({ 
+            user: json
+          });
          }
      
       })
@@ -74,22 +89,12 @@ export default class App extends Component {
      })
       });
     }
-    
-      async getKey() {
-        try {
-          const value = await AS.getItem('@token');
-          console.log('accediendo la key',value);
-         return (value)
-        } catch (error) {
-          console.log("Error retrieving data" + error);
-        };
-      }
-    
+       
     
       onButtonPressLogout()
       {
     this.getKey().then(value => {
-      console.log(value)
+  //    console.log(value)
       fetch(LOGOUT_URL,{
         method:'POST',
         body: JSON.stringify({
@@ -150,6 +155,30 @@ export default class App extends Component {
     }
     console.log('fcmToken:', fcmToken);
     this.setState({ token: fcmToken });
+
+  //Token Save POST
+ /* this.saveKey().then(value => {
+    //console.log('value',value)
+    fetch(TOKEN_FCM_URL+'1'+'/'+'ifjiqjefijeifjiqejfiqjefiqejfiqejfi',{
+      method:'POST',
+      body: JSON.stringify({
+        token: fcmToken
+      }),
+      headers:{ 
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+        },
+  })
+  .then(response => response.json())
+  .then(json =>{
+     console.log('JSON',json);
+  })
+  .catch((error) => {
+    console.log('ERROR',error)
+ })
+  });*/
+ //End Token Save Post
+
   }
 
   //2
@@ -229,7 +258,7 @@ export default class App extends Component {
       case true:
         return (
           <CardSection>
-            <Button onPress={() => firebase.auth().signOut()}>Salir</Button>
+            <Button onPress={this.onButtonPressLogout.bind(this)}>Salir</Button>
           </CardSection>
         );
       case false:

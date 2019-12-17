@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import AsyncStorage from '@react-native-community/async-storage';
+//import AsyncStorage from '@react-native-community/async-storage';
 import {  Button, Spinner, CardSection, } from "./common";
-import { Text, View } from "react-native";
+import { Text, View, AsyncStorage } from "react-native";
 import LoginForm from "./LoginForm";
 import { USER_URL, LOGOUT_URL} from "../config/URL";
 
@@ -16,13 +16,13 @@ constructor(props){
   this.login = this.login.bind(this);
 }
 
-componentWillMount() {
+ componentDidMount() {
     this.login();   
   }
 
   login() {
     this.getKey().then(value => {
-        console.log('value',value)
+        console.log('tokenLogin',value)
         fetch(USER_URL,{
           method:'POST',
           body: JSON.stringify({
@@ -56,8 +56,8 @@ componentWillMount() {
 
     async getKey() {
         try {
-          const value = await AsyncStorage.getItem('@token');
-          console.log('accediendo la key',value);
+          const value = await AsyncStorage.getItem('token');
+          console.log('accediendo la key del login',value);
          return (value)
         } catch (error) {
           console.log("Error retrieving data" + error);
