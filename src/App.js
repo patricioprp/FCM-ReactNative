@@ -1,4 +1,3 @@
-
 import React, { Component } from "react";
 import { Text, View, Alert, AsyncStorage } from "react-native";
 import firebase from "react-native-firebase";
@@ -33,26 +32,26 @@ export default class App extends Component {
     this.createNotificationListeners(); //add this line
   }
 
-  async saveToken(fcmToken,id) {
-      //Token Save POST
+  async saveToken(fcmToken, id) {
+    //Token Save POST
     this.getKey().then(value => {
-        fetch(TOKEN_FCM_URL + "/" + id + "/" + fcmToken, {
-          method: "POST",
-          body: JSON.stringify({
-            token: value
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          }
+      fetch(TOKEN_FCM_URL + "/" + id + "/" + fcmToken, {
+        method: "POST",
+        body: JSON.stringify({
+          token: value
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(response => response.json())
+        .then(json => {
+          console.log("JSONSAVE", json);
         })
-          .then(response => response.json())
-          .then(json => {
-            console.log("JSONSAVE", json);
-          })
-          .catch(error => {
-            console.log("ERRORSAVE", error);
-          });
+        .catch(error => {
+          console.log("ERRORSAVE", error);
+        });
     });
     //End Token Save Post
   }
@@ -172,9 +171,8 @@ export default class App extends Component {
     this.setState({ token: fcmToken });
     //aqui podriamos intentar conseguir el user desde un Asyncstorage y luego llamar la funcion save token y pasar por parametors el tokenFCM
 
-
     this.getUser().then(value => {
-      this.saveToken(fcmToken,value);
+      this.saveToken(fcmToken, value);
     });
   }
 
